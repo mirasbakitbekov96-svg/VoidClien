@@ -1,0 +1,39 @@
+name: Build VOIDCLIENT
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Extract project
+        run: |
+          unzip -o VOIDCLIENT-1.1.0-GITHUB-BUILD.zip -d extracted
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Build VOIDCLIENT
+        run: gradle build --no-daemon
+        working-directory: extracted/VOIDCLIENT-1.21.4
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: VOIDCLIENT-1.21.4
+          path: extracted/VOIDCLIENT-1.21.4/build/libs/*.jar
